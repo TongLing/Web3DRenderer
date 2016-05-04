@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html  xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<!--
+== OpenJSCAD.org, Copyright (c) 2013-2016 by Rene K. Mueller <spiritdude@gmail.com>, Licensed under MIT License ==
+   with some code from OpenJsCad processfile.html by Joost Nieuwenhuijse
+   in conjunction with csg.js, openjscad.js, lightgl.js by various authors (see them listed in the individual files)
+
+Purpose:
+   More modern interface for OpenJsCad as published at http://joostn.github.com/OpenJsCad/
+
+History:
+- 2016/02/02: 0.4.0: refactored, functionality split up into more files, mostly done by Z3 Dev
+- 2015/10/23: 0.3.1: including new parameter options by Z3 Dev
+- 2015/07/02: 0.3.0: format.js (Stefan Baumann), and Blob.js/openjscad improved by Z3 Dev
+- 2015/05/20: 0.2.4: renumbering, latest csg.js from http://joostn.github.com/OpenJsCad/ adapted
+- 2015/04/08: 0.024: dev branch opened
+- 2015/02/14: 0.023: bumping version based on openscad.js
+- 2015/02/04; 0.020: browser window resizing done properly, thanks to Z3 devs via pull request
+- 2015/01/07: 0.019: various pull requests from github merged again
+- 2014/10/05: 0.018: various pull requests from github merged
+- 2013/04/11: 0.017: alpha channel supported in color() and .setColor()
+- 2013/04/07: 0.016: csg.js: solidFromSlices() and .setColor() on polygon level, and examples by Eduard Bespalov
+- 2013/04/05: 0.015: rudimentary AMF export and import, web and cli
+- 2013/04/03: 0.014: multiple files via drag'n'drop, developing locally
+- 2013/04/01: 0.013: include() on web-online & drag'n'drop (but not off-line) and cli (server-side)
+- 2013/03/20: 0.012: improved UI (slider from the left)
+- 2013/03/28: 0.011: rectangular_extrude(), rotate_extrude() added, and torus()
+- 2013/03/22: 0.010: leave .scad file intact, and translate on-the-fly
+- 2013/03/20: 0.009: OpenSCAD .scad (via openscad-openjscad-translator) and .stl experimental import support integrated
+- 2013/03/15: 0.008: minor changes, parameter window smaller, css changes
+- 2013/03/14: 0.007: including jQuery to make UI changes easier, e.g. hint window moveable now
+- 2013/03/11: 0.005: resize of browser fixed by fixing canvas size to full screen, and avoid scrollbars
+- 2013/03/10: 0.001: first version, integrating ACE editor, for now pulled from 3rd party web-site
+
+Todo:
+- saving source code edited in ACE locally, perhaps 'SaveAs' (.JSCAD, .STL, .AMF)
+- DONE: include(); support of multiple files, see http://jsfiddle.net/yybRu/
+
+-->
+    <meta http-equiv=Pragma content=no-cache>
+    <meta http-equiv=Expires content=-1>
+    <meta http-equiv=CACHE-CONTROL content=NO-CACHE>
+
+    <title>OpenJSCAD.org</title>
+    <link rel="shortcut icon" href="imgs/favicon.png" type="image/x-png">
+    <link rel="stylesheet" href="jquery/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" href="style.css?0.4.0" type="text/css">
+    <link rel="stylesheet" href="openjscad.css?0.4.0" type="text/css">
+  </head>
+  <body>
+    <script src="jquery/jquery-1.9.1.js"></script>
+    <script src="jquery/jquery-ui.js"></script>
+    <script src="jquery/jquery.hammer.js"></script>
+    <script src="lightgl.js"></script>
+    <script src="csg.js?0.4.0"></script>
+    <script src="formats.js?0.4.0"></script>
+    <script src="openjscad.js?0.4.0"></script>
+    <script src="js/jscad-worker.js?0.4.0" charset="utf-8"></script>
+    <script src="js/jscad-function.js?0.4.0" charset="utf-8"></script>
+    <script src="openscad.js?0.4.0"></script>
+    <script src="underscore.js"></script>
+    <script src="openscad-openjscad-translator.js"></script>
+    <script src="ace/ace.js?0.4.0" charset="utf-8"></script>
+    <script src="js/ui-drag-drop.js?0.4.0" charset="utf-8"></script>
+    <script src="js/ui-editor.js?0.4.0" charset="utf-8"></script>
+    <script src="js/ui-cookies.js?0.4.0" charset="utf-8"></script>
+    <script src="js/ui-worker.js?0.4.0" charset="utf-8"></script>
+    <script src="js/index.js?0.4.0" charset="utf-8"></script>
+
+<!-- top left header (logo and error message) -->
+    <div id="header">
+      
+
+      <div id="errordiv"></div>
+    </div>
+
+<!-- sliding tab (help, links, examples, options, etc) -->
+    <div id="menu">
+      <img id="menuHandle" src="imgs/menuHandle.png">
+     
+                  <div id="bugList" href="#" onclick="$('#questions').show(); return false;">
+            <a href="#">需要改进的地方</a>
+        </div>
+
+        <div id="menuVersion">版本号： <script>document.write(OpenJsCad.version);</script></div>
+        <p/>
+          
+        <table class="info">
+        <div id="examplesTitle" class="navlink">
+            <p><a href = "#">使用说明</a>
+            </div>
+          <tr><td align="right" class="infoOperation">执行代码</td><td class="infoKey">Shift + Enter</td></tr>
+          <tr><td align="right" class="infoOperation">旋转 XZ 轴</td><td class="infoKey">Command + 鼠标左键</td></tr>
+          <tr><td align="right" class="infoOperation">平移</td><td class="infoKey">Shift + 鼠标左键</td></tr>
+          <tr><td align="right" class="infoOperation">Rotate XY</td><td class="infoKey">鼠标左键</td></tr>
+          <tr><td align="right" class="infoOperation">放大/缩小</td><td class="infoKey">鼠标滚轮</td></tr>
+        </table>
+        <p>
+          <a class="navlink" href="https://github.com/Spiritdude/OpenJSCAD.org/wiki/User-Guide" target="_blank">使用文档 <img src="imgs/externalLink.png" style="externalLink"></a>
+          
+        </p>
+        <p>
+          <a class="navlink" href="https://plus.google.com/115007999023701819645" rel="publisher" target="_blank">最近更新 <img src="imgs/externalLink.png" style="externalLink"></a>
+        </p>
+        <p>
+          <a class="navlink" href="https://plus.google.com/communities/114958480887231067224" target="_blank">开发者社区（需要翻墙） <img src="imgs/externalLink.png" style="externalLink"></a>
+          
+        </p>
+    
+        <div id="examplesTitle" class="navlink"><a href='#' onclick='return false'>样例文件</a></div>
+        <div id="examples"></div>
+
+        <p/>
+
+     
+<!-- 
+        <div id="optionsTitle" class="navlink"><a href='#' onclick='return false'>Options</a></div>
+        <div id="options"></div>
+        <span class="menuSubInfo">Your personal settings</span></p>
+ -->
+        <p/>
+        <b>支持的三维文件格式</b>
+        <table class="info">
+          <tr><td align="right"><b>jscad</b></td><td><a target="_blank" href="https://github.com/Spiritdude/OpenJSCAD.org/wiki/User-Guide">OpenJSCAD</a> 支持编辑,导入/导出</td></tr>
+          <tr><td align="right"><b>scad</b></td><td><a target="_blank" href="http://openscad.org">OpenSCAD</a> (<a target=_blank href="https://github.com/Spiritdude/OpenJSCAD.org/wiki/User-Guide#direct-openscad-scad-import"></a>测试中, 支持导入</td></tr>
+          <tr><td align="right"><b>stl</b></td><td><a target="_blank" href="http://en.wikipedia.org/wiki/STL_(file_format)">STL format</a> (测试中, 支持导入/导出)</td></tr>
+          <tr><td align="right"><b>amf</b></td><td><a target="_blank" href="http://en.wikipedia.org/wiki/Additive_Manufacturing_File_Format">AMF format</a> 测试中,支持导入/导出</td></tr>
+        </table>
+        <p><a class="navlink" href="#" onclick="$('#about').show(); return false;">作者</a></p>
+      </nav>
+    </div> <!-- /menu -->
+        <div id="questions">
+            <h2>剩下的功能点</h2>
+            <p>1、支持格式：需要支持VRML格式和STEP格式，需要支持这两个格式的导入展示。</p>
+            <b>导入过程</b>：<br/>
+            (1)将文件拖到框框内<br/>
+            (2)index.js ui-drag-drop去识别这个框框内部的文件，worker-conversion得到相应的script和信息<br/>
+            (3)将script信息经过字符串转换，转换成相应的jscad代码<br/>
+            (4)将相应的jscad代码贴到在线编辑器里<br/>
+            (5)运行jscad代码 jscad-worker.js, 生成图形<br/>
+            
+            <br/>
+            <b>导出过程：</b><br/>
+            (1)从jscad代码中拾取所有代码<br/>
+            (2)将代码中的信息提取出来，生成一个新的文件<br/>
+            (3)将该文件形成相应的内容，通过blob组件导出<br/>
+            <p>2、图元拾取：框选，点选，基于颜色，体积等属性的拾取。</p>
+            <p>3、外观编辑：着色，材质、纹理等。</p>
+            <p>4、撤销恢复：编辑与浏览需要具备撤销与恢复能力，撤销与恢复的步数最少需要10步。</p>
+            
+     <a class="okButton" href='#' onclick="$('#questions').hide(); return false;"> OK </a>    
+            <p></p>
+        </div>
+<!-- about dialog -->
+    <div id="about">
+      <img src="imgs/title.png">
+      <br/>Version <script>document.write(OpenJsCad.version);</script>
+      <p>
+by
+Joost Nieuwenhuijse (core),
+Ren&eacute; K. M&uuml;ller (UI & CLI),
+Stefan Baumann (core),
+Z3 Dev (CLI & GUI),
+Eduard Bespalov (core),
+Gary Hogdson (OpenSCAD translator)
+      </p>
+      <p>csg.js core &amp; improvements by
+Evan Wallace,
+Eduard Bespalov,
+Joost Nieuwenhuijse,
+Alexandre Girard
+      </p>
+      <p>
+License: MIT License<br>
+Get your copy/clone/fork from <a href="https://github.com/Spiritdude/OpenJSCAD.org" target=_blank>GitHub: OpenJSCAD</a>
+      </p>
+      <p>
+        <br/><a class="okButton" href='#' onclick="$('#about').hide(); return false;"> OK </a>
+      </p>
+    </div> <!-- about -->
+
+<!-- editor -->
+    <div id="editFrame">
+      <div>
+        <img id="editHandle" src="imgs/editHandleIn.png"></img>
+      </div>
+      <div id="editor">
+// 代码编辑区域
+// 这是我自己定义的新型三维文件格式，用这个格式的代码
+// 可以很容易地创建新的三维几何体
+function main() {
+   return union(
+      difference(
+         cube({size: 3, center: true}),
+         sphere({r:2, center: true})
+      ),
+      intersection(
+          sphere({r: 1.3, center: true}),
+          cube({size: 2.1, center: true})
+      )
+   ).translate([0,0,1.5]).scale(10);
+}
+      </div>
+    </div> <!-- editor -->
+
+<!-- design viewer -->
+    <div oncontextmenu="return false;" id="viewerContext"></div> <!-- avoiding popup when right mouse is clicked -->
+
+<!-- design parameters -->
+    <div id="parametersdiv"></div>
+
+<!-- design information (status message, download buttons, drag and drop area, etc) -->
+    <div id="tail">
+      <div id="statusdiv"></div>
+      <div id="filedropzone">
+        <div id="filedropzone_empty">
+<script>document.write("把jscad, scad, amf, stl文件拖到这里 "+
+     (browser=='chrome'&&me=='web-online'?"or folder with jscad files ":"")+
+     "(<a style='font-weight: normal' href='https://github.com/Spiritdude/OpenJSCAD.org/wiki/User-Guide#support-of-include' target=_blank>详细文档</a>) "+
+     "<br>或者直接在编辑器里编辑代码");
+</script>
+       </div>
+       <div id="filedropzone_filled">
+         <span id="currentfile">...</span>
+         <div id="filebuttons">
+           <button id="getstlbutton" style="display:none" onclick="getStl();">Get STL</button>
+           <button onclick="reloadAllFiles();">Reload</button>
+           <!--button onclick="parseFile(gCurrentFile,true,false);">Debug (see below)</button-->
+           <label for="autoreload">Auto Reload</label><input type="checkbox" name="autoreload" value="" id="autoreload" onclick="toggleAutoReload();">
+         </div>
+       </div>
+      </div>
+    </div> <!-- tail -->
+
+<!-- footer (version, copyright) -->
+    <div id="footer">
+
+    </div>
+  </body>
+</html>
