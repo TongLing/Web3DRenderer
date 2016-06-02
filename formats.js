@@ -12,6 +12,7 @@ Exporting CSG into various formats:
    - STL (ASCII & Binary)
    - DXF
    - AMF 
+   - possibly(vrl, stp)
 
 License: MIT license
 
@@ -185,7 +186,7 @@ CSG.prototype.toStlBinary = function() {
     var allTrianglesBuffer = new ArrayBuffer(50 * numtriangles);
     var allTrianglesBufferAsInt8 = new Int8Array(allTrianglesBuffer);
     // a tricky problem is that a Float32Array must be aligned at 4-byte boundaries (at least in certain browsers)
-    // while each triangle takes 50 bytes. Therefore we write each triangle to a temporary buffer, and copy that
+    // while each t riangle takes 50 bytes. Therefore we write each triangle to a temporary buffer, and copy that
     // into allTrianglesBuffer:
     var triangleBuffer = new ArrayBuffer(50);
     var triangleBufferAsInt8 = new Int8Array(triangleBuffer);

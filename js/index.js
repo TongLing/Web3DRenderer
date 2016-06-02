@@ -101,7 +101,7 @@ $(document).ready(function() {
   });
 
 var ex = [
-  { file:'logo.jscad', title: 'OpenJSCAD.org Logo' },
+  { file:'jscad/logo.jscad', title: 'OpenJSCAD.org Logo' },
   { file:'logo.amf', title: 'OpenJSCAD.org Logo', type: 'AMF' },
 
   { file:'example001.jscad', title: 'Sphere with cutouts', spacing: true },

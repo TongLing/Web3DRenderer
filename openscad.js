@@ -2075,6 +2075,7 @@ function parseVRML(vrl,fn){
     //函數功能：將vrl格式的文件轉換爲指定格式
     //第一个参数是源文件字符串,第二个参数是源文件名
     //要求转换成可以读取的jscad格式
+    // 返回值就是编辑器里面得到的代码
     var str = "";
     
    /* 需要转换成的格式为:
@@ -2106,7 +2107,30 @@ function parseSTEP(stp,fn){
     //第一个参数是源文件字符串,第二个参数是源文件名
     //要求转换成可以读取的jscad格式
     var str = "";
-
+    str += "function main(){";
+    str += "\n";
+    str += "return union (";
+    str += "\n";
+    str += "polyhedron({";
+    str += "\n";
+/*    points:[ [x1,y1,z1],
+               [x2,y2,z2],
+               ...
+               [xn,yn,zn] ],
+             */
+/*
+             polygons:[
+                     [p1,p2,p3],
+                     [p2,p3,p4],
+                     [p4,p5,p2],
+                     ...
+                     [pa,pb,pc]]*/    
+    str += "\n";
+    str += "\n";
+    str += "\n";
+    str += "\n";
+    str += "\n";
+    str += "\n";
     /*需要转换成的格式为:
     1 function main(){
     2     return union (
