@@ -68,6 +68,17 @@ Todo:
     <script src="js/ui-cookies.js?0.4.0" charset="utf-8"></script>
     <script src="js/ui-worker.js?0.4.0" charset="utf-8"></script>
     <script src="js/index.js?0.4.0" charset="utf-8"></script>
+    <link rel="stylesheet" media="screen" type="text/css" href="css/colorpicker.css">
+    <script src="js/colorpicker.js"></script>
+    <script type="text/javascript">
+    	 $(function() {
+			$('#colorSelector').ColorPicker({
+				onChange: function(hsb, hex, rgb) {
+					 $('#colorSelector').css('backgroundColor', '#' + hex);
+			 	}
+		 	});
+		});
+    </script>
 
 <!-- top left header (logo and error message) -->
     <div id="header">
@@ -79,15 +90,19 @@ Todo:
 <!-- sliding tab (help, links, examples, options, etc) -->
     <div id="menu">
       <img id="menuHandle" src="imgs/menuHandle.png">
-     
-                  <div id="bugList" href="#" onclick="$('#questions').show(); return false;">
-            <a href="#">需要改进的地方</a>
+     <div id="menuVersion">版本号： <script>document.write(OpenJsCad.version);</script></div>
+        <div  class="navlink" style="clear:both;margin-top:30px;">
+            <p>
+                <a clas="revoke" onclick="revoke()"><img alt="撤销" id="revoke" title="撤销"  src="images/revoke_none.png"  style="margin-left:50px;" /></a>
+                <a class="resume" onclick="resume()"><img alt="恢复" id="resume" title="恢复" src="images/rollback_none.png" style="margin-left:10px;" /></a>
+            </p>
         </div>
-
-        <div id="menuVersion">版本号： <script>document.write(OpenJsCad.version);</script></div>
-        <p/>
+        <div  style="margin-top:5px;">
+          <div style="float:left">拾色器:</div>
+          <div id="colorSelector" style="width:30px;height:30px;background-color:#C140CE;float:left;margin-left:15px;" href="#"></div>
+        </div>
           
-        <table class="info">
+        <table class="info" style="clear:both;margin-top:20px;">
         <div id="examplesTitle" class="navlink">
             <p><a href = "#">使用说明</a>
             </div>
